@@ -1,0 +1,7 @@
+# Godot Addon Requirements
+# Format: <addon_directory_name> <repository_url> [branch]
+# Lines starting with # are comments
+3d_player_controller https://github.com/kirbycope/godot-3d-player-controller.git main
+Mirror3D https://github.com/Joy-less/Mirror3D.git main
+portals https://github.com/VojtaStruhar/godot-portals-plugin.git main
+virtual_controller https://github.com/kirbycope/godot-virtual-controller.git main
