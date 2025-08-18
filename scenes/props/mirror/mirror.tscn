@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3 uid="uid://bwd3k6206h3um"]
 
 [ext_resource type="PackedScene" uid="uid://delu2qjrw6teu" path="res://addons/Mirror3D/Mirror3D.tscn" id="1_5o7h0"]
-[ext_resource type="Script" uid="uid://bn428i2p801do" path="res://scenes/props/mirror.gd" id="1_652kc"]
-[ext_resource type="AudioStream" uid="uid://dxd0j0y7nex4l" path="res://assets/sounds/34201__themfish__glass_house1.wav" id="2_nha6m"]
+[ext_resource type="Script" uid="uid://bn428i2p801do" path="res://scenes/props/mirror/mirror.gd" id="1_652kc"]
+[ext_resource type="AudioStream" uid="uid://dxd0j0y7nex4l" path="res://assets/sounds/mirror/34201__themfish__glass_house1.wav" id="2_nha6m"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_nha6m"]
 size = Vector3(1, 2, 0.01)

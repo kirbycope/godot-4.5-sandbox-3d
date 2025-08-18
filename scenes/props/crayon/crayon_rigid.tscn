@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=4 uid="uid://c0xr10lkn0418"]
 
-[ext_resource type="Texture2D" uid="uid://8473hqn5xlai" path="res://assets/textures/crayon_purple.png" id="1_n3apr"]
+[ext_resource type="Texture2D" uid="uid://8473hqn5xlai" path="res://assets/textures/crayon/crayon_purple.png" id="1_n3apr"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_87c5q"]
 albedo_color = Color(0.5647059, 0, 0.5647059, 1)

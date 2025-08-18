@@ -1,8 +1,8 @@
 [gd_scene load_steps=8 format=3 uid="uid://dduy3hngy8xk3"]
 
-[ext_resource type="Script" uid="uid://cspbpvx8gjq7" path="res://scenes/kickball.gd" id="1_nqiug"]
-[ext_resource type="AudioStream" uid="uid://dp5cmodyset2b" path="res://assets/sounds/blouncing_ball_3.wav" id="2_46fg8"]
-[ext_resource type="Texture2D" uid="uid://fbl3rb8eqwol" path="res://assets/textures/13620.jpg" id="3_4bmev"]
+[ext_resource type="Script" uid="uid://cspbpvx8gjq7" path="res://scenes/props/kickball/kickball.gd" id="1_nqiug"]
+[ext_resource type="AudioStream" uid="uid://dp5cmodyset2b" path="res://assets/sounds/kickball/bouncing_ball_3.wav" id="2_46fg8"]
+[ext_resource type="Texture2D" uid="uid://fbl3rb8eqwol" path="res://assets/textures/kickball/13620.jpg" id="3_4bmev"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_bounce"]
 friction = 0.2

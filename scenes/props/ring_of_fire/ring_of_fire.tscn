@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://bij47vxq4dovl"]
 
 [ext_resource type="Shader" uid="uid://b8mh63n7unn48" path="res://scenes/props/ring_of_fire/fire.gdshader" id="1_jjww4"]
-[ext_resource type="AudioStream" uid="uid://cxnhqiot5ntqn" path="res://assets/sounds/569345__backhzsound__gas-firepit-burning.mp3" id="2_dlkw0"]
+[ext_resource type="AudioStream" uid="uid://cxnhqiot5ntqn" path="res://assets/sounds/fire/569345__backhzsound__gas-firepit-burning.mp3" id="2_dlkw0"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jjww4"]
 albedo_color = Color(0.6627451, 0.27058825, 0.27058825, 1)

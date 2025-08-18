@@ -1,10 +1,10 @@
 [gd_scene load_steps=9 format=3 uid="uid://b7wnthj3i5cl5"]
 
-[ext_resource type="Script" uid="uid://cnkrget2dwpet" path="res://scenes/jenga_block.gd" id="1_0w8n3"]
-[ext_resource type="Texture2D" uid="uid://c7hsfsxhknanr" path="res://assets/textures/Wood061_1K-JPG_Color.jpg" id="1_04e1i"]
-[ext_resource type="Texture2D" uid="uid://6he72ttskqei" path="res://assets/textures/Wood061_1K-JPG_AmbientOcclusion.jpg" id="2_0w8n3"]
-[ext_resource type="Texture2D" uid="uid://dnp2eex0htt8t" path="res://assets/textures/Wood061_1K-JPG_Roughness.jpg" id="3_srkvf"]
-[ext_resource type="Texture2D" uid="uid://b2btxtyjsyksf" path="res://assets/textures/Wood061_1K-JPG_NormalGL.jpg" id="4_5xa68"]
+[ext_resource type="Script" uid="uid://cnkrget2dwpet" path="res://scenes/props/jenga/jenga_block.gd" id="1_0w8n3"]
+[ext_resource type="Texture2D" uid="uid://c7hsfsxhknanr" path="res://assets/textures/jenga/Wood061_1K-JPG_Color.jpg" id="1_04e1i"]
+[ext_resource type="Texture2D" uid="uid://6he72ttskqei" path="res://assets/textures/jenga/Wood061_1K-JPG_AmbientOcclusion.jpg" id="2_0w8n3"]
+[ext_resource type="Texture2D" uid="uid://dnp2eex0htt8t" path="res://assets/textures/jenga/Wood061_1K-JPG_Roughness.jpg" id="3_srkvf"]
+[ext_resource type="Texture2D" uid="uid://b2btxtyjsyksf" path="res://assets/textures/jenga/Wood061_1K-JPG_NormalGL.jpg" id="4_5xa68"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_04e1i"]
 size = Vector3(3.75, 0.75, 1.25)

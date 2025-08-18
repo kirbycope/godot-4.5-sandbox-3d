@@ -1,9 +1,9 @@
 [gd_scene load_steps=6 format=3 uid="uid://cerdia3yemyf8"]
 
-[ext_resource type="Texture2D" uid="uid://dfu636lpftagg" path="res://assets/textures/Wood026_1K-JPG_Color.jpg" id="2_t4in0"]
-[ext_resource type="Texture2D" uid="uid://b7i502ojap4ao" path="res://assets/textures/Wood026_1K-JPG_Displacement.jpg" id="3_0ftmc"]
-[ext_resource type="Texture2D" uid="uid://kp0vlsylhe3d" path="res://assets/textures/Wood026_1K-JPG_NormalGL.jpg" id="4_ir0sa"]
-[ext_resource type="Texture2D" uid="uid://dlig6boypymuy" path="res://assets/textures/Wood026_1K-JPG_Roughness.jpg" id="5_7ql4s"]
+[ext_resource type="Texture2D" uid="uid://dfu636lpftagg" path="res://assets/textures/lincoln_log/Wood026_1K-JPG_Color.jpg" id="2_t4in0"]
+[ext_resource type="Texture2D" uid="uid://b7i502ojap4ao" path="res://assets/textures/lincoln_log/Wood026_1K-JPG_Displacement.jpg" id="3_0ftmc"]
+[ext_resource type="Texture2D" uid="uid://kp0vlsylhe3d" path="res://assets/textures/lincoln_log/Wood026_1K-JPG_NormalGL.jpg" id="4_ir0sa"]
+[ext_resource type="Texture2D" uid="uid://dlig6boypymuy" path="res://assets/textures/lincoln_log/Wood026_1K-JPG_Roughness.jpg" id="5_7ql4s"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_43jwy"]
 albedo_texture = ExtResource("2_t4in0")
