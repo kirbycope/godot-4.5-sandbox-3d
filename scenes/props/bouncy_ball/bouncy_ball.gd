@@ -1,8 +1,8 @@
 extends RigidBody3D
 
-const SFX_1 = preload("res://assets/sounds/log/258061__jagadamba__large-piece-of-wood-being-dropped-01-1.mp3")
-const SFX_2 = preload("res://assets/sounds/log/258065__jagadamba__large-piece-of-wood-being-dropped-03-1.mp3")
-const SFX_3 = preload("res://assets/sounds/log/258066__jagadamba__large-piece-of-wood-being-dropped-02-1.mp3")
+const SFX_1 = preload("res://assets/sounds/bouncy_ball/621518__lutherlighty__bouncy-ball_01.wav")
+const SFX_2 = preload("res://assets/sounds/bouncy_ball/621518__lutherlighty__bouncy-ball_02.wav")
+const SFX_3 = preload("res://assets/sounds/bouncy_ball/621518__lutherlighty__bouncy-ball_03.wav")
 
 @export var velocity_threshold: float = 5.0 ## Minimum velocity magnitude to play sound
 

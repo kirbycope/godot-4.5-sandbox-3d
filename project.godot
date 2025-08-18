@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="Godot 4.5 Sandbox 3D"
+config/name="Godot 4.5 Sandbox 3d"
 run/main_scene="uid://k5pv30odtm07"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
@@ -21,6 +21,10 @@ window/size/viewport_width=1280
 window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/portals/plugin.cfg")
 
 [input_devices]
 

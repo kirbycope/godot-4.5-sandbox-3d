@@ -1,7 +1,7 @@
 extends RigidBody3D
 
-const SFX_1 = preload("res://assets/sounds/wood/94859__cjosephwalker__foley-wood-sword-fall.wav")
-const SFX_2 = preload("res://assets/sounds/wood/653128__marb7e__wood_plank_impact_ground.wav")
+const SFX_1 = preload("res://assets/sounds/jenga/94859__cjosephwalker__foley-wood-sword-fall.wav")
+const SFX_2 = preload("res://assets/sounds/jenga/653128__marb7e__wood_plank_impact_ground.wav")
 
 @export var velocity_threshold: float = 5.0 ## Minimum velocity magnitude to play sound
 
