@@ -15,23 +15,32 @@ func _input(event: InputEvent) -> void:
 		if event.is_action_pressed("button_0") and player.enable_double_jump and !player.is_double_jumping:
 			# Check if the animation player is not locked
 			if !player.is_animation_locked:
-				# Set the player's vertical velocity
-				player.velocity.y = player.jump_velocity
-				# Set the "double jumping" flag
-				player.is_double_jumping = true
+				# Check if the player is not on the ground
+				if !player.is_on_floor():
+					# Set the player's vertical velocity
+					player.velocity.y = player.jump_velocity
+					# Set the "double jumping" flag
+					player.is_double_jumping = true
 
 		# Ⓐ/[Space] _pressed_ and flying is enabled --> Start "flying"
-		if event.is_action_pressed("button_0") and player.enable_flying:
+		if event.is_action_pressed("button_0") and player.enable_flying and !player.is_flying and !player.is_on_floor():
 			# Check if the animation player is not locked
 			if !player.is_animation_locked:
 				# Start "flying"
 				transition(NODE_NAME, "Flying")
 
+		# Ⓐ/[Space] _pressed_ and paragliding is enabled --> Start "paragliding"
+		if event.is_action_pressed("button_0") and player.enable_paragliding and !player.is_paragliding and !player.is_on_floor():
+			# Check if the player has a glider
+			if player.head_mount.get_child_count() > 0:
+				# Check if the animation player is not locked
+				if !player.is_animation_locked:
+					# Start "paragliding"
+					transition(NODE_NAME, "Paragliding")
+
 
 ## Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	# Uncomment the next line if using GodotSteam
-	#if !is_multiplayer_authority(): return
 	# Check if the game is not paused
 	if !player.game_paused:
 		# Check if the player is not canceling a climb or hang

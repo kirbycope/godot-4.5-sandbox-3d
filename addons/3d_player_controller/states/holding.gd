@@ -85,9 +85,6 @@ func _input(event: InputEvent) -> void:
 
 ## Called every frame. '_delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	# Uncomment the next line if using GodotSteam
-	#if !is_multiplayer_authority(): return
-
 	# Set the player as "rotating" if they are holding something and pressing R1
 	player.is_rotating_object = player.is_holding and Input.is_action_pressed("button_5")
 
@@ -260,7 +257,7 @@ func throw_held_object() -> void:
 			if player.animation_player.current_animation != ANIMATION_STANDING_THROWING_LEFT:
 				# Play the "throwing left" animation
 				player.animation_player.play(ANIMATION_STANDING_THROWING_LEFT)
-				# [Hack] Start playing partway through the animation
+				# Start playing partway through the animation
 				var animation_length = player.animation_player.get_animation(ANIMATION_STANDING_THROWING_LEFT).length
 				player.animation_player.seek(animation_length * 0.2)
 				

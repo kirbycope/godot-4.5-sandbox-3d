@@ -37,17 +37,8 @@ func _input(event: InputEvent) -> void:
 
 		# (D-Pad Down)/[Q] _pressed_ -> Drop skateboard
 		if event.is_action_pressed("button_13"):
-			# Slow to a stop
-			player.velocity = Vector3.ZERO
-			# Get the skateboard
-			var item = player.visuals.get_node("FootMount").get_children()[0]
-			# Remove the skateboard from the player
-			player.visuals.get_node("FootMount").remove_child(item)
 			# Reparent the skateboard from the player to current scene
-			player.get_tree().current_scene.add_child(item)
-			# Clear the references
-			player.is_skateboarding_on.player = null
-			player.is_skateboarding_on = null
+			player.reparent_equipped_foot_items()
 			# Check if the player is on the ground
 			if player.is_on_floor():
 				# Start standing
@@ -60,8 +51,6 @@ func _input(event: InputEvent) -> void:
 
 ## Called every frame. '_delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	# Uncomment the next line if using GodotSteam
-	#if !is_multiplayer_authority(): return
 	# Check if the player is not "skateboarding"
 	if !player.is_skateboarding:
 		# Start "standing"
@@ -122,21 +111,19 @@ func play_animation() -> void:
 
 		# The player must not be moving
 		else:
-				# Play the "slow skateboarding" animation
-				player.animation_player.play(ANIMATION_SKATEBOARDING_SLOW)
+			# Play the "slow skateboarding" animation
+			player.animation_player.play(ANIMATION_SKATEBOARDING_SLOW)
 
-				# Slow down the animation player
-				player.animation_player.speed_scale = 0.5
+			# Slow down the animation player
+			player.animation_player.speed_scale = 0.5
 
 
 ## Start "skateboarding".
 func start() -> void:
 	# Enable _this_ state node
 	process_mode = PROCESS_MODE_INHERIT
-
 	# Set the player's new state
 	player.current_state = STATES.State.SKATEBOARDING
-
 	# Flag the player as "skateboarding"
 	player.is_skateboarding = true
 
@@ -145,15 +132,9 @@ func start() -> void:
 func stop() -> void:
 	# Disable _this_ state node
 	process_mode = PROCESS_MODE_DISABLED
-
 	# [Re]Set the player animation speed
 	player.animation_player.speed_scale = 1.0
-
 	# [Re]Set audio player pitch
 	player.audio_player.pitch_scale = 1.0
-
 	# Flag the player as not "skateboarding"
 	player.is_skateboarding = false
-
-	# Remove the skateboard with the player
-	player.is_skateboarding_on = null

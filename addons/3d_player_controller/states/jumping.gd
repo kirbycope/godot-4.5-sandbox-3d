@@ -28,11 +28,18 @@ func _input(event: InputEvent) -> void:
 				# Start "flying"
 				transition(NODE_NAME, "Flying")
 
+		# Ⓐ/[Space] _pressed_ and paragliding is enabled --> Start "paragliding"
+		if event.is_action_pressed("button_0") and player.enable_paragliding and !player.is_paragliding and !player.is_on_floor():
+			# Check if the player has a glider
+			if player.head_mount.get_child_count() > 0:
+				# Check if the animation player is not locked
+				if !player.is_animation_locked:
+					# Start "paragliding"
+					transition(NODE_NAME, "Paragliding")
+
 
 ## Called every frame. '_delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	# Uncomment the next line if using GodotSteam
-	#if !is_multiplayer_authority(): return
 	# Check if the game is not paused
 	if !player.game_paused:
 		# Check if the player is not canceling a climb or hang

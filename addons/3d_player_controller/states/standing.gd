@@ -218,8 +218,6 @@ func _input(event: InputEvent) -> void:
 
 ## Called every frame. '_delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	# Uncomment the next line if using GodotSteam
-	#if !is_multiplayer_authority(): return
 	# Check if the game is not paused
 	if !player.game_paused:
 		# Ⓨ/[Ctrl] _pressed_ and crouching is enabled -> Start "crouching"
@@ -247,6 +245,11 @@ func _process(_delta: float) -> void:
 
 		# Check if the player is moving
 		if player.velocity != Vector3.ZERO or player.virtual_velocity != Vector3.ZERO:
+			# Check if the player is not on a floor
+			if !player.is_on_floor() and !player.raycast_below.is_colliding():
+				# Start "falling"
+				transition(NODE_NAME, "Falling")
+
 			# Check if the player is slower than or equal to "walking"
 			if 0.0 < player.speed_current and player.speed_current <= player.speed_walking:
 				# Start "walking"
@@ -434,14 +437,6 @@ func start() -> void:
 
 	# Set the player's velocity
 	player.velocity = Vector3.ZERO
-
-	# [Re]Set player visual rotation
-	player.visuals_aux_scene.rotation = Vector3(
-		deg_to_rad(0.0),
-		deg_to_rad(-180.0),
-		deg_to_rad(0.0)
-	)
-
 
 ## Stop "standing".
 func stop() -> void:

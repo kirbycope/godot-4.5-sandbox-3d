@@ -10,8 +10,6 @@ var time_driving: float = 0.0 ## The time spent driving the vehicle.
 
 ## Called every frame. '_delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	# Uncomment the next line if using GodotSteam
-	#if !is_multiplayer_authority(): return
 	# Check if the player is "driving"
 	if player.is_driving:
 		# Play the animation
@@ -60,8 +58,24 @@ func stop() -> void:
 	# Reset player velocity to prevent flying when exiting
 	player.velocity = Vector3.ZERO
 
+	# Check if player is still parented to the vehicle
+	if player.is_driving_in and player.get_parent() != get_tree().current_scene:
+		# Store global position before reparenting
+		var player_global_pos = player.global_position
+		var player_global_rot = player.global_rotation
+		
+		# Reparent player back to main scene
+		var current_parent = player.get_parent()
+		current_parent.remove_child(player)
+		get_tree().current_scene.add_child(player)
+		
+		# Restore global position
+		player.global_position = player_global_pos
+		player.global_rotation = player_global_rot
+
 	# Remove the player from the vehicle
-	player.is_driving_in.player = null
+	if player.is_driving_in:
+		player.is_driving_in.player = null
 
 	# Remove the vehicle with the player
 	player.is_driving_in = null

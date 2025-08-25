@@ -20,6 +20,7 @@ const STATES = preload("res://addons/3d_player_controller/states/states.gd")
 @export var enable_jumping: bool = true ## Enable jumping
 @export var enable_kicking: bool = true ## Enable kicking
 @export var enable_noclip: bool = false ## Enable noclip
+@export var enable_paragliding: bool = true ## Enable paragliding
 @export var enable_punching: bool = true ## Enable punching
 @export var enable_sprinting: bool = true ## Enable sprinting
 @export var enable_vibration: bool = false ## Enable controller vibration
@@ -32,6 +33,7 @@ const STATES = preload("res://addons/3d_player_controller/states/states.gd")
 @export var jump_velocity: float = 4.5 ## Jump velocity
 @export var lock_movement_x: bool = false ## Lock movement on the X axis
 @export var lock_movement_y: bool = false ## Lock movement on the Y axis
+@export var rotation_smoothing: float = 30.0 ## Speed of rotation smoothing interpolation
 @export var speed_climbing: float = 0.5 ## Speed while climbing
 @export var speed_crawling: float = 0.75 ## Speed while crawling
 @export var speed_current: float = 3.0 ## Current speed
@@ -71,13 +73,13 @@ var is_firing: bool = false ## Is the player firing a weapon?
 var is_flying: bool = false ## Is the player flying?
 var is_hanging: bool = false ## Is the player hanging from a ledge?
 var is_holding: bool = false ## Is the player holding an object in front of them?
-var is_holding_onto ## The object the player is holding in front of them.
 var is_holding_fishing_rod: bool = false ## Is the player holding a fishing rod?
 var is_holding_rifle: bool = false ## Is the player holding a rifle?
 var is_holding_tool: bool = false ## Is the player holding a tool?
 var is_jumping: bool = false ## Is the player jumping?
 var is_kicking_left: bool = false ## Is the player kicking with the left foot?
 var is_kicking_right: bool = false ## Is the player kicking with the right foot?
+var is_paragliding: bool = false ## Is the player paragliding?
 var is_punching_left: bool = false ## Is the player punching with the left hand?
 var is_punching_right: bool = false ## Is the player punching with the right hand?
 var is_pushing: bool = false ## Is the player pushing something?
@@ -86,7 +88,6 @@ var is_rotating_object: bool = false ## Is the player rotating an object being h
 var is_running: bool = false ## Is the player running?
 var is_shimmying: bool = false ## Is the player shimmying along a ledge?
 var is_skateboarding: bool = false ## Is the player skateboarding?
-var is_skateboarding_on ## The Node the player is skateboarding on.
 var is_sprinting: bool = false ## Is the player sprinting?
 var is_standing: bool = false ## Is the player standing?
 var is_swinging_left: bool = false ## Is the player swinging with the left arm?
@@ -128,6 +129,8 @@ var virtual_velocity: Vector3 = Vector3.ZERO ## The velocity of the player if th
 @onready var raycast_below = raycast_top.get_node("../RayCast3D_BelowPlayer")
 # Visuals and Skeleton
 @onready var visuals = $Visuals
+@onready var foot_mount = visuals.get_node("FootMount")
+@onready var head_mount = visuals.get_node("HeadMount")
 @onready var visuals_offset = visuals.position
 @onready var visuals_aux_scene = visuals.get_node("AuxScene")
 @onready var visuals_aux_scene_position = visuals_aux_scene.position
@@ -139,14 +142,13 @@ var virtual_velocity: Vector3 = Vector3.ZERO ## The velocity of the player if th
 @onready var look_at_modifier = player_skeleton.get_node("LookAtModifier3D")
 @onready var physical_bone_simulator = player_skeleton.get_node_or_null("PhysicalBoneSimulator3D")
 # Initial Values
-@onready var initial_position = position
+@onready var initial_aux_scene_transform: Transform3D = visuals_aux_scene.transform
+@onready var initial_position = position ## used for "Return Home" in START menu
 @onready var initial_shapecast_target_position = shapecast.target_position
 
 
 ## Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	# Uncomment the next line if using GodotSteam
-	#camera.current = is_multiplayer_authority()
 	# Set the canvas layer behind all other Control nodes
 	$Controls.layer = -1
 
@@ -156,9 +158,6 @@ func _ready() -> void:
 
 ## Called each physics frame with the time since the last physics frame as argument (delta, in seconds).
 func _physics_process(delta) -> void:
-	# Uncomment the next line if using GodotSteam
-	#if !is_multiplayer_authority(): return
-
 	# Don't process physics if in ragdoll state - let the physics bones handle everything
 	if current_state == STATES.State.RAGDOLL:
 		return
@@ -199,11 +198,14 @@ func _physics_process(delta) -> void:
 	# Move player (physics movement)
 	move_player(delta)
 
+	# Check if the player is not driving
+	if !is_driving:
+		# Update AuxScene position if top_level is true
+		update_aux_scene_transform(delta)
+
 
 ## Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	# Uncomment the next line if using GodotSteam
-	#if !is_multiplayer_authority(): return
 	# Check if the game is not paused
 	if !game_paused:
 		# Check if the noclip mode is enabled
@@ -527,7 +529,7 @@ func move_player(delta: float) -> void:
 		# Adjust the position to be at the player's feet
 		shapecast.target_position.y = initial_shapecast_target_position.y
 	else:
-		# [Hack] Move the shapecast up to avoid most collisions
+		# Move the shapecast up to avoid most collisions
 		shapecast.target_position.y = 0.0
 
 	# Create a new physics query object used for checking collisions in 3D space
@@ -569,36 +571,41 @@ func move_player(delta: float) -> void:
 
 ## Reparent the held item to the root of the scene tree.
 func reparent_held_item() -> void:
-	# Check if the player is holding an item
-	if is_holding_onto != null:
-		# Remove the item from the player
-		visuals.get_node("HeldItemMount").remove_child(is_holding_onto)
-		# Reparent the item to the main scene
-		get_tree().current_scene.add_child(is_holding_onto)
-		# Reset holding state
-		is_holding = false
-		# Stop holding the item
-		is_holding_onto = null
+	# Reset holding state
+	is_holding = false
 	# Reparent any foot items
 	reparent_equipped_foot_items()
 	# Reparent any hand items
 	reparent_equipped_hand_items()
-	# Reset the flags for holding items
-	is_holding_fishing_rod = false
-	is_holding_rifle = false
-	is_holding_tool = false
+	# Reparent any head items
+	reparent_equipped_head_items()
 
 
 ## Reparents all items attached to the left and right foot bones to the main scene.
 func reparent_equipped_foot_items() -> void:
+	# Reparent the under foot items
+	for child in foot_mount.get_children():
+		# Remove the player from the item
+		if "player" in child:
+			child.player = null
+		# Remove the item from the player
+		foot_mount.remove_child(child)
+		# Reparent the item to the main scene
+		get_tree().current_scene.add_child(child)
 	# Reparent the left foot items
 	for child in bone_attachment_left_foot.get_children():
+		# Remove the player from the item
+		if "player" in child:
+			child.player = null
 		# Remove the item from the player
 		bone_attachment_left_foot.remove_child(child)
 		# Reparent the item to the main scene
 		get_tree().current_scene.add_child(child)
 	# Reparent the right foot items
 	for child in bone_attachment_right_foot.get_children():
+		# Remove the player from the item
+		if "player" in child:
+			child.player = null
 		# Remove the item from the player
 		bone_attachment_right_foot.remove_child(child)
 		# Reparent the item to the main scene
@@ -609,12 +616,18 @@ func reparent_equipped_foot_items() -> void:
 func reparent_equipped_hand_items() -> void:
 	# Reparent the left hand items
 	for child in bone_attachment_left_hand.get_children():
+		# Remove the player from the item
+		if "player" in child:
+			child.player = null
 		# Remove the item from the player
 		bone_attachment_left_hand.remove_child(child)
 		# Reparent the item to the main scene
 		get_tree().current_scene.add_child(child)
 	# Reparent the right hand items
 	for child in bone_attachment_right_hand.get_children():
+		# Remove the player from the item
+		if "player" in child:
+			child.player = null
 		# Remove the item from the player
 		bone_attachment_right_hand.remove_child(child)
 		# Reparent the item to the main scene
@@ -623,6 +636,55 @@ func reparent_equipped_hand_items() -> void:
 	is_holding_fishing_rod = false
 	is_holding_rifle = false
 	is_holding_tool = false
+
+
+## Reparent the overhead item to the root of the scene tree.
+func reparent_equipped_head_items() -> void:
+	# Reparent the overhead items
+	for child in head_mount.get_children():
+		# Remove the player from the item
+		if "player" in child:
+			child.player = null
+		# Remove the item from the player
+		head_mount.remove_child(child)
+		# Reparent the item to the main scene
+		get_tree().current_scene.add_child(child)
+
+
+## Updates the AuxScene transform to follow the player when top_level is true
+func update_aux_scene_transform(delta: float) -> void:
+	# Check if AuxScene exists
+	if visuals_aux_scene != null:
+		# Check if AuxScene has top_level enabled
+		if visuals_aux_scene.top_level != null:
+			# Calculate target rotation
+			var target_rotation = Vector3(
+				visuals.global_rotation.x,
+				visuals.global_rotation.y + initial_aux_scene_transform.basis.get_euler().y,
+				visuals.global_rotation.z
+			)
+			# Convert current and target rotations to quaternions for smooth interpolation
+			var current_quat = Quaternion.from_euler(visuals_aux_scene.rotation)
+			var target_quat = Quaternion.from_euler(target_rotation)
+			# Slerp the rotation with a smooth interpolation factor
+			var smooth_quat = current_quat.slerp(target_quat, rotation_smoothing * delta)
+			# Apply the smoothed rotation
+			visuals_aux_scene.rotation = smooth_quat.get_euler()
+
+			# Calculate the target position based on player and visuals transforms
+			var target_global_position = global_position + (global_transform.basis * visuals_offset)
+			# Apply smoothing (if enabled)
+			if raycast_below.is_colliding() and velocity != Vector3.ZERO and !is_climbing and !is_driving and !is_falling and !is_flying and !is_hanging and !is_jumping and !is_shimmying:
+				# Get the current position of the AuxScene
+				var current_position = visuals_aux_scene.global_position
+				# Smooth only the y-axis position
+				var smooth_y = lerp(current_position.y, target_global_position.y, 10 * delta)
+				# Set the new position based on lerp value
+				visuals_aux_scene.global_position = Vector3(target_global_position.x, smooth_y, target_global_position.z)
+			# Smoothing must not be enabled
+			else:
+				# No smoothing, directly set position
+				visuals_aux_scene.global_position = target_global_position
 
 
 ## Toggles the noclip mode.
