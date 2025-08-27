@@ -45,6 +45,8 @@ func _ready() -> void:
 
 	# Ensure the player is on collision layer 16
 	player.set_collision_layer_value(16, true)
+	player.set_collision_mask_value(16, true)
+
 
 func _apply_portal_material():
 	# Wait a frame to ensure Portal3D has set up its material
