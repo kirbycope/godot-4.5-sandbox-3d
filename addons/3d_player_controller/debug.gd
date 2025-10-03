@@ -2,6 +2,8 @@ extends Control
 
 # Note: `@onready` variables are set when the scene is loaded.
 @onready var player: CharacterBody3D = get_parent().get_parent().get_parent()
+@onready var x_bot = player.get_node("Visuals/XBot")
+@onready var y_bot = player.get_node("Visuals/YBot")
 
 # Track which bot model is currently loaded
 var is_using_x_bot: bool = false
@@ -47,6 +49,7 @@ func _process(_delta: float) -> void:
 		$Panel1/IsJumping.button_pressed = player.is_jumping
 		$Panel1/IsKickingLeft.button_pressed = player.is_kicking_left
 		$Panel1/IsKickingRight.button_pressed = player.is_kicking_right
+		$Panel1/IsNavigating.button_pressed = player.is_navigating
 		$Panel1/IsParagliding.button_pressed = player.is_paragliding
 		$Panel1/IsPunchingLeft.button_pressed = player.is_punching_left
 		$Panel1/IsPunchingRight.button_pressed = player.is_punching_right
@@ -76,16 +79,19 @@ func _process(_delta: float) -> void:
 		$Panel1/Swinging/IsSwingingLeft.button_pressed = player.is_swinging_left
 		$Panel1/Swinging/IsSwingingRight.button_pressed = player.is_swinging_right
 		# Panel 2
-		$Panel2/EnableCrouching.button_pressed = player.enable_crouching
-		$Panel2/EnableClimbing.button_pressed = player.enable_climbing
 		$Panel2/EnableChat.button_pressed = player.enable_chat
+		$Panel2/EnableClickToMove.button_pressed = player.enable_click_to_move
+		$Panel2/EnableClimbing.button_pressed = player.enable_climbing
+		$Panel2/EnableCrouching.button_pressed = player.enable_crouching
 		$Panel2/EnableDoubleJump.button_pressed = player.enable_double_jump
 		$Panel2/EnableFlying.button_pressed = player.enable_flying
 		$Panel2/EnableJumping.button_pressed = player.enable_jumping
 		$Panel2/EnableKicking.button_pressed = player.enable_kicking
 		$Panel2/EnableParagliding.button_pressed = player.enable_paragliding
 		$Panel2/EnablePunching.button_pressed = player.enable_punching
+		$Panel2/EnablePushing.button_pressed = player.enable_pushing
 		$Panel2/EnableRolling.button_pressed = player.enable_rolling
+		$Panel2/EnableSmoothing.button_pressed = player.enable_smoothing
 		$Panel2/EnableSprinting.button_pressed = player.enable_sprinting
 		$Panel2/EnableVibration.button_pressed = player.enable_vibration
 		$Panel2/LockCamera.button_pressed = player.lock_camera
@@ -102,6 +108,12 @@ func _process(_delta: float) -> void:
 ## Called when the "enable_chat" toggle option is changed.
 func _on_enable_chat_toggled(toggled_on: bool) -> void:
 	player.enable_chat = toggled_on
+
+
+## Called when the "enable_click_to_move" toggle option is changed.
+func _on_enable_click_to_move_toggled(toggled_on: bool) -> void:
+	player.enable_click_to_move = toggled_on
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE if player.game_paused else Input.MOUSE_MODE_CAPTURED)
 
 
 ## Called when the "enable_climbing" toggle option is changed.
@@ -134,6 +146,7 @@ func _on_enable_kicking_toggled(toggled_on: bool) -> void:
 	player.enable_kicking = toggled_on
 
 
+## Called when the "enable_paragliding" toggle option is changed.
 func _on_enable_paragliding_toggled(toggled_on: bool) -> void:
 	player.enable_paragliding = toggled_on
 
@@ -143,9 +156,19 @@ func _on_enable_punching_toggled(toggled_on: bool) -> void:
 	player.enable_punching = toggled_on
 
 
+## Called when the "enable_pushing" toggle option is changed.
+func _on_enable_pushing_toggled(toggled_on: bool) -> void:
+	player.enable_pushing = toggled_on
+
+
 ## Called when the "enable_rolling" toggle option is changed.
 func _on_enable_rolling_toggled(toggled_on: bool) -> void:
 	player.enable_rolling = toggled_on
+
+
+## Called when the "enable_smoothing" toggle option is changed.
+func _on_enable_smoothing_toggled(toggled_on):
+	player.enable_smoothing = toggled_on
 
 
 ## Called when the "enable_sprinting" toggle option is changed.
@@ -189,9 +212,6 @@ func trigger_swap_model(use_x_bot: bool) -> void:
 
 ## Performs the actual bot model swap locally
 func _perform_bot_model_swap() -> void:
-	# Preload the bot scenes
-	const X_BOT_SCENE = preload("res://addons/3d_player_controller/x_bot.tscn")
-	const Y_BOT_SCENE = preload("res://addons/3d_player_controller/y_bot.tscn")
 	# Get the current AuxScene
 	var current_aux_scene = player.get_node("Visuals/AuxScene")
 	# Get the current AuxScene's animation
@@ -201,12 +221,14 @@ func _perform_bot_model_swap() -> void:
 	# Remove the current AuxScene immediately
 	player.get_node("Visuals").remove_child(current_aux_scene)
 	current_aux_scene.free()
-	# Instantiate the new bot scene
+	# Create a duplicate of the existing bot node
 	var new_scene
 	if is_using_x_bot:
-		new_scene = X_BOT_SCENE.instantiate()
+		new_scene = x_bot.duplicate()
 	else:
-		new_scene = Y_BOT_SCENE.instantiate()
+		new_scene = y_bot.duplicate()
+	# Set the scene visibility
+	new_scene.visible = true
 	# Set the scene name
 	new_scene.name = "AuxScene"
 	# Ensure the new AuxScene is top-level so it ignores parent transforms (matches original setup)

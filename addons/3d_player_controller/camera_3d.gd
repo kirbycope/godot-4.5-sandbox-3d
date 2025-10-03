@@ -7,7 +7,6 @@ extends Camera3D
 @export var zoom_max: float = 1.0
 @export var zoom_min: float = 1.0
 @export var zoom_speed: float = 0.2
-@export var smoothing_enabled: bool = true
 @export var smoothing_speed_y: float = 8.0
 
 # Note: `@onready` variables are set when the scene is loaded.
@@ -47,6 +46,12 @@ func _input(event: InputEvent) -> void:
 			if event.is_action_pressed("button_11"):
 				# Move the camera away from the player, slightly
 				zoom_offset = clamp(zoom_offset - zoom_speed, -zoom_max, zoom_max)
+		# Check if Click-To-Move is enabled
+		if player.enable_click_to_move:
+			if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+				Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+			elif Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+				Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 		# Check for mouse motion and the camera is not locked
 		if event is InputEventMouseMotion and !player.lock_camera:
 			# Check if the mouse is captured
@@ -97,7 +102,7 @@ func follow_camera_mount(delta: float) -> void:
 		# Calculate the target position
 		target_position = camera_mount.global_position + camera_mount.global_transform.basis * (base_offset + zoom_vector)
 		# Apply smoothing (if enabled)
-		if smoothing_enabled and player.raycast_below.is_colliding() and player.velocity != Vector3.ZERO and !player.is_climbing and !player.is_driving and !player.is_falling and !player.is_flying and !player.is_jumping:
+		if player.enable_smoothing and player.raycast_below.is_colliding() and player.velocity != Vector3.ZERO and !player.is_climbing and !player.is_driving and !player.is_falling and !player.is_flying and !player.is_jumping:
 			# Get the current position of the Camera3D
 			var current_position = global_position
 			# Smooth only the y-axis position
